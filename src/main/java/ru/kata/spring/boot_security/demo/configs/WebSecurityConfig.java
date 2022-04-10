@@ -1,7 +1,5 @@
 package ru.kata.spring.boot_security.demo.configs;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.ejb.HibernateEntityManagerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,7 +11,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.kata.spring.boot_security.demo.sevice.UserService;
 import ru.kata.spring.boot_security.demo.sevice.UserServiceImpl;
 
 @EnableWebSecurity
@@ -21,12 +18,11 @@ import ru.kata.spring.boot_security.demo.sevice.UserServiceImpl;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final SuccessUserHandler successUserHandler;
-    private final UserService userService;
-    private HibernateEntityManagerFactory hemf;
+    private final UserServiceImpl userServiceImpl;
 
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserService userService) {
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserServiceImpl userServiceImpl) {
         this.successUserHandler = successUserHandler;
-        this.userService = userService;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @Override
@@ -55,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider dap = new DaoAuthenticationProvider();
         dap.setPasswordEncoder(passwordEncoder());
-        dap.setUserDetailsService(userService);
+        dap.setUserDetailsService(userServiceImpl);
         return dap;
     }
 
@@ -63,7 +59,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
-
 
     // аутентификация inMemory
 //    @Bean
