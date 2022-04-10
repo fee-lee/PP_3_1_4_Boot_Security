@@ -3,6 +3,7 @@ package ru.kata.spring.boot_security.demo.model;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,6 +19,7 @@ public class Role implements GrantedAuthority {
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "roles")
     private List<User> userList;
+//            = new ArrayList<>();
 
     public List<User> getUserList() {
         return userList;
