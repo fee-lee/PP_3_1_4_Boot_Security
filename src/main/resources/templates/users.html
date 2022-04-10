@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+</head>
+<body>
+<h2 th:align="center">Список пользователей</h2>
+<table th:align="center" th:border="1">
+    <thead>
+    <th>Name</th>
+    <th>Lastname</th>
+    <th>eMail</th>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.getName()}"></td>
+        <td th:text="${user.getLastName()}"></td>
+        <td th:text="${user.geteMail()}"></td>
+        <td>
+            <a th:href="@{/admin/edit/{id}(id=${user.getId})}">Edit</a></td>
+        <td>
+            <form th:method="delete" th:action="@{/admin/delete/{id}(id=${user.getId})}">
+                <input type="submit" value="Delete"/>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<br>
+<div th:align="center">
+    <br>
+    <a th:href="@{/admin/newUser}">create User</a>
+    <br>
+    <a th:href="@{/logout}">Logout</a>
+</div>
+</body>
+</html>
