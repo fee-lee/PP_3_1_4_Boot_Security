@@ -5,7 +5,10 @@ import ru.kata.spring.boot_security.demo.model.Role;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 public class RoleDAOImpl implements RoleDAO {
@@ -13,18 +16,17 @@ public class RoleDAOImpl implements RoleDAO {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Transactional
     @Override
-    public void addRole(Role role) {
-        entityManager.persist(role);
+    public List<Role> getAllRoles() {
+        return entityManager.createQuery("from Role", Role.class)
+                .getResultList();
     }
 
     @Override
-    public Role getRoleByName(Role role) {
-        return entityManager.createQuery("select r from Role r", Role.class)
-                .getResultStream()
-                .filter(name -> name.getRole().equals(role.getRole()))
-                .findAny()
-                .orElse(null);
+    public Set<Role> getRoleByName(String[] role) {
+        return entityManager.createQuery("select r from Role r where r.role in (:nameRole)", Role.class).
+                setParameter("nameRole", Arrays.asList(role)).
+                getResultList().
+                stream().collect(Collectors.toSet());
     }
 }

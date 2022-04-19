@@ -16,7 +16,7 @@
     <tr th:each="user : ${users}">
         <td th:text="${user.getName()}"></td>
         <td th:text="${user.getLastName()}"></td>
-        <td th:text="${user.geteMail()}"></td>
+        <td th:text="${user.getEmail()}"></td>
         <td>
             <a th:href="@{/admin/edit/{id}(id=${user.getId})}">Edit</a></td>
         <td>
@@ -31,6 +31,7 @@
 <div th:align="center">
     <br>
     <a th:href="@{/admin/newUser}">create User</a>
+    <br>
     <br>
     <a th:href="@{/logout}">Logout</a>
 </div>

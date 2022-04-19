@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head>
-    <title th:text="${user.getName()}"/>
+    <title th:text="${userPage.getName()}"/>
 </head>
 <body>
-<h2 th:align="center">Your page.</h2>
+<h2 th:align="center">Это вся информация о тебе.</h2>
 <table th:align="center" th:border="1">
     <thead>
     <th>Name</th>
     <th>Lastname</th>
     <th>eMail</th>
+    <th>Role</th>
     </thead>
     <tbody>
-
-        <td th:text="${user.getName()}"/>
-        <td th:text="${user.getLastName()}"/>
-        <td th:text="${user.geteMail()}"/>
-
-
+        <td th:text="${userPage.getName()}"/>
+        <td th:text="${userPage.getLastName()}"/>
+        <td th:text="${userPage.getEmail()}"/>
+        <td th:text="${userPage.getRoles()}"/>
     </tbody>
 </table>
 <div th:align="center">

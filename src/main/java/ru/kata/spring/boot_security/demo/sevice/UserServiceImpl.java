@@ -1,9 +1,5 @@
 package ru.kata.spring.boot_security.demo.sevice;
 
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.kata.spring.boot_security.demo.dao.UserDAO;
@@ -13,13 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private final UserDAO userDAO;
     private final PasswordEncoder passwordEncoder;
 
-
-    @Lazy
     public UserServiceImpl(UserDAO userDAO, PasswordEncoder passwordEncoder) {
         this.userDAO = userDAO;
         this.passwordEncoder = passwordEncoder;
@@ -28,14 +22,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Transactional
     @Override
     public void saveUsers(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode((user.getPassword())));
         userDAO.saveUsers(user);
     }
 
     @Transactional
     @Override
     public void updateUser(User user) {
-        if (user.getPassword().equals("")) {
+        if (user.getPassword() == null) {
             user.setPassword(userDAO.findById(user.getId()).getPassword());
         } else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -57,21 +51,5 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User findById(long id) {
         return userDAO.findById(id);
-    }
-
-    @Override
-    public User getByEmail(String email) {
-        return userDAO.getUserByEmail(email);
-    }
-
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userDAO.getUserByEmail(email);
-        if (user == null) {
-            throw new UsernameNotFoundException("Not found " + email);
-        }
-        return user;
-//                userDAO.getUserByEmail(email);
     }
 }

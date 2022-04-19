@@ -1,9 +1,7 @@
 package ru.kata.spring.boot_security.demo.configs;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,19 +10,19 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.kata.spring.boot_security.demo.sevice.UserServiceImpl;
 
 @EnableWebSecurity
 //        (debug = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final SuccessUserHandler successUserHandler;
-    private final UserServiceImpl userServiceImpl;
+    private final UserDetailsService userDetailsService;
 
-    @Autowired
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserServiceImpl userServiceImpl) {
+
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, @Qualifier("userDetailsService") UserDetailsService userDetailsService) {
         this.successUserHandler = successUserHandler;
-        this.userServiceImpl = userServiceImpl;
+
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -53,7 +51,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider dap = new DaoAuthenticationProvider();
         dap.setPasswordEncoder(passwordEncoder());
-        dap.setUserDetailsService(userServiceImpl);
+        dap.setUserDetailsService(userDetailsService);
         return dap;
     }
 
@@ -62,17 +60,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder(12);
     }
 
-    // аутентификация inMemory
-//    @Bean
-//    @Override
-//    public UserDetailsService userDetailsService() {
-//        UserDetails user =
-//                User.withDefaultPasswordEncoder()
-//                        .username("user")
-//                        .password("user")
-//                        .roles("USER")
-//                        .build();
-//
-//        return new InMemoryUserDetailsManager(user);
-//    }
 }

@@ -6,28 +6,38 @@
 </head>
 <body>
 <h2 th:align="center">Изменить пользователя.</h2>
-<form th:action="@{/admin/{id}(id=${user.id})}" th:method="put" th:object="${user}">
+<form th:action="@{/admin/{id}(id=${userEdit.id})}" th:method="put" th:object="${userEdit}">
     <table th:align="center" th:border="1">
         <tr>
             <td>Введите имя</td>
             <td>Введите фамилию</td>
+            <td>Введите E-mail</td>
+            <td>Введите новый пароль</td>
         </tr>
         <tr>
             <td>
-                <input th:type="text" th:field="*{name}" id="name"/>
+                <input th:type="text" th:field="${userEdit.name}" id="name"/>
             </td>
             <td>
-                <input th:type="text" th:field="*{lastName}" id="lastName"/>
+                <input th:type="text" th:field="${userEdit.lastName}" id="lastName"/>
             </td>
             <td>
-                <input th:type="text" th:field="*{eMail}" id="eMail"/>
+                <input th:type="text" th:field="${userEdit.email}" id="Email"/>
             </td>
             <td>
-                <input th:type="text" th:field="*{password}" id="password"/>
+                <input th:type="password" th:field="${userEdit.password}" id="password"/>
             </td>
         </tr>
     </table>
     <br>
+    <label>Roles:
+        <input type="checkbox" name="role"
+               th:each="role : ${roles}"
+               th:text="${role.getRole()}"
+               th:value="${role.getRole()}"
+               th:field="*{roles}"
+        />
+    </label>
     <div th:align="center">
         <input type="submit" value="Применить"/>
     </div>

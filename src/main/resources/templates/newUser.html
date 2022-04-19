@@ -6,7 +6,7 @@
 </head>
 <body>
 <h2 th:align="center">Cоздать пользователя.</h2>
-<form th:action="@{/admin/new}" th:method="POST" th:object="${user}">
+<form th:action="@{/admin/new}" th:method="POST" th:object="${newUser}">
     <table th:align="center" th:border="1">
         <tr>
             <td>Введите имя</td>
@@ -16,20 +16,31 @@
         </tr>
         <tr>
             <td>
-                <input th:type="text" th:field="*{name}" id="name"/>
+                <input th:type="text" th:field="${newUser.email}" id="name">
             </td>
             <td>
-                <input th:type="text" th:field="*{lastName}" id="lastName"/>
+                <input th:type="text" th:field="${newUser.lastName}" id="lastName">
             </td>
             <td>
-                <input th:type="text" th:field="*{eMail}" id="eMail"/>
+                <input th:type="text" th:field="${newUser.name}" id="eMail">
             </td>
             <td>
-                <input th:type="text" th:field="*{password}" id="password"/>
+                <input th:type="password" th:field="${newUser.password}" id="password">
             </td>
         </tr>
     </table>
     <br>
+    <br>
+    <label>Roles:
+        <input type="checkbox" name="role"
+               th:each="role : ${getRoles}"
+               th:text="${role.getRole()}"
+               th:value="${role.getRole()}"
+               th:field="*{roles}"
+        />
+    </label>
+    <br/>
+
     <div th:align="center">
         <input type="submit" th:value="Создать"/>
     </div>

@@ -16,19 +16,4 @@ public class SpringBootSecurityDemoApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootSecurityDemoApplication.class, args);
 	}
-
-//	@Bean
-//	public CommandLineRunner initUser(UserService userService) {
-//		return args -> {
-//			if (userService.getAllUsers().size() < 1) {
-//				User user = new User();
-//				user.setName("admin");
-//				user.setLastName("admin");
-//				user.setPassword("admin");
-//				user.setEmail("admin@mail");
-//				user.setRoles(Collections.singleton(new Role("ROLE_ADMIN")));
-//				userService.saveUsers(user);
-//			}
-//		};
-//	}
 }
