@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUser(User user) {
-        if (user.getPassword() == null) {
+        if (user.getPassword().equals("")) {
             user.setPassword(userDAO.findById(user.getId()).getPassword());
         } else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
