@@ -1,27 +1,79 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+
     <title th:text="${userPage.getName()}"/>
 </head>
 <body>
-<h2 th:align="center">Это вся информация о тебе.</h2>
-<table th:align="center" th:border="1">
-    <thead>
-    <th>Name</th>
-    <th>Lastname</th>
-    <th>eMail</th>
-    <th>Role</th>
-    </thead>
-    <tbody>
-        <td th:text="${userPage.getName()}"/>
-        <td th:text="${userPage.getLastName()}"/>
-        <td th:text="${userPage.getEmail()}"/>
-        <td th:text="${userPage.getRoles()}"/>
-    </tbody>
-</table>
-<div th:align="center">
-    <br>
-    <a th:href="@{/logout}">Logout</a>
+<header>
+    <nav class="navbar navbar-dark bg-dark">
+        <span class="navbar-brand mb-0 h2">
+            <strong><a th:text="${userPage.getEmail()}">${userPage.getEmail()</a></strong>
+            <span class="text-start">with roles:
+            <a th:each="role : ${userPage.getRoles()}" th:text="${role}">${userPage.getRoles()}</a></span>
+        </span>
+        <ul class="navbar-nav px-4">
+            <li class="nav-item text-nowrap">
+                <a class="nav-link" href="/logout">Logout</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<!--Side-bar--Left-->
+<div class="row mt-5">
+   <div class="col-2 fixed-left">
+        <div th:fragment="leftmenu">
+            <ul class="nav flex-sm-column">
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link" th:classappend="${#httpServletRequest.getRequestURI().equals('/admin/') ? 'active bg-primary text-white' : ''}"
+                    href="#" th:href="@{/admin}" aria-current="page">Admin</a>
+                </li>
+                <li class="nav-item" sec:authorize="hasRole('USER')">
+                    <a class="nav-link" th:classappend="${#httpServletRequest.getRequestURI().equals('/user') ? 'active bg-primary text-white' : ''}"
+                       href="#" th:href="@{/user}" aria-current="page">User</a>
+                </li>
+            </ul>
+
+        </div>
+    </div>
+    <div class="col-10 bg-light">
+
+        <h1>User information</h1>
+        <div>
+            <p><strong>user</strong></p>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Last Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Role</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <td th:text="${userPage.getId()}"></td>
+                        <td th:text="${userPage.getName()}"/>
+                        <td th:text="${userPage.getLastName()}"/>
+                        <td th:text="${userPage.getEmail()}"/>
+                        <td th:text="${userPage.getRoles()}"/>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
 </body>
 </html>

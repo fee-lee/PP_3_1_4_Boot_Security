@@ -5,12 +5,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.sevice.RoleService;
 import ru.kata.spring.boot_security.demo.sevice.UserService;
-
-import java.util.List;
 
 @Controller
 public class UserController {
@@ -26,33 +23,17 @@ public class UserController {
 
     //  Output on display all users from ADMIN.
     @GetMapping("/admin")
-    public String getAllUsers(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
+    public String getAllUsers(@AuthenticationPrincipal User user, Model model) {
+        model.addAttribute("users", userService.findById(user.getId()));
+        model.addAttribute("userList", userService.getAllUsers());
+        model.addAttribute("roles", roleService.getAllRoles());
         return "users";
-    }
-
-    //  Output on display form input data for new user.
-    @GetMapping("/admin/newUser")
-    public String newUser(Model model) {
-        User user = new User();
-        model.addAttribute("newUser", user);
-        List<Role> roles = roleService.getAllRoles();
-        model.addAttribute("getRoles", roles);
-        return "newUser";
     }
 
     //  Sending data user's for add new user.
     @PostMapping("/admin/new")
-    public String createUser(@RequestParam("name") String name,
-                             @RequestParam("lastName") String lastName,
-                             @RequestParam("email") String email,
-                             @RequestParam("password") String password,
-                             @RequestParam("roles") String[] roles) {
-        User user = new User();
-        user.setName(name);
-        user.setLastName(lastName);
-        user.setEmail(email);
-        user.setPassword(password);
+    public String createUser(@ModelAttribute("user") User user,
+                             @RequestParam(value = "rolesN") String[] roles) {
         user.setRoles(roleService.getRoleByName(roles));
         userService.saveUsers(user);
         return "redirect:/admin";
@@ -60,40 +41,38 @@ public class UserController {
 
     //  Output on display form input data edit for user.
     @GetMapping("/admin/edit/{id}")
-    public String edit(@PathVariable("id") long id, Model model) {
+    public String edit(@ModelAttribute("user") User user,
+                        @PathVariable("id") long id,
+                       Model model,
+                       @RequestParam(value = "rolesE") String[] roles) {
+        user.setRoles(roleService.getRoleByName(roles));
         model.addAttribute("userEdit", userService.findById(id));
         model.addAttribute("roles", roleService.getAllRoles());
-        return "edit";
+        return "users";
 }
     //  Save updating user.
     @PutMapping("/admin/{id}")
-    public String update(@RequestParam("name") String name,
-                         @RequestParam("lastName") String lastName,
-                         @RequestParam("email") String email,
-                         @RequestParam("password") String password,
-                         @RequestParam("roles") String[] roles,
-                         @PathVariable("id") long id) {
-        User user = userService.findById(id);
-        user.setName(name);
-        user.setLastName(lastName);
-        user.setEmail(email);
-        user.setPassword(password);
+    public String update(@ModelAttribute("user") User user,
+                         @RequestParam("rolesE") String[] roles) {
         user.setRoles(roleService.getRoleByName(roles));
-        System.out.println(user.getPassword());
         userService.updateUser(user);
         return "redirect:/admin";
     }
 
-
-    @DeleteMapping("/admin/delete/{id}")
+//    Delete user
+    @GetMapping("/admin/delete/{id}")
     public String delete(@PathVariable("id") long id) {
         userService.deleteByIdUsers(id);
         return "redirect:/admin";
     }
 
+//  Show ordinal user
     @GetMapping("/user")
     public String pageUser(@AuthenticationPrincipal User user, Model model) {
-        model.addAttribute("userPage", user);
+        model.addAttribute("userPage", userService.findById(user.getId()));
+        System.out.println(user);
+        model.addAttribute("rolesU" , userService.findById(user.getId()).getRoles());
+        System.out.println(user.getRoles());
         return "user";
     }
 }
