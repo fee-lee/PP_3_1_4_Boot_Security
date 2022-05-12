@@ -47,7 +47,7 @@ public class UserController {
                        @RequestParam(value = "rolesE") String[] roles) {
         user.setRoles(roleService.getRoleByName(roles));
         model.addAttribute("userEdit", userService.findById(id));
-        model.addAttribute("roles", roleService.getAllRoles());
+        model.addAttribute("rolesE", roleService.getAllRoles());
         return "users";
 }
     //  Save updating user.

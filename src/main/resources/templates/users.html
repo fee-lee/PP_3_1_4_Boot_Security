@@ -122,15 +122,7 @@
                 <div class="container-fluid text-center col-2">
                     <form class="col" th:action="@{/admin/new}" th:method="post" th:object="${userList}">
                         <div class="row justify-content-center">
-                            <div class="row">
-                                <div class="input-group input-group-sm mb-3">
-                                    <label>Id
-                                        <input type="text" name="Id" id="Id"
-                                               class="form-control"
-                                               aria-label="Small" aria-describedby="inputGroup-sizing-sm">
-                                    </label>
-                                </div>
-                            </div>
+
                             <div class="row">
                                 <div class="input-group input-group-sm mb-3">
                                     <label>Name
@@ -323,4 +315,209 @@
     </div>
 </div>
 </body>
+<!--======================================================================================-->
+<script type="text/javascript">
+
+    const URL = 'http://localhost:8080/api/users'
+    const userssTable = document.querySelector('#allUsers')
+    const userFetchHandler = {
+        head: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Referer': null
+        },
+
+        updateUser: async (user) => await fetch(URL, {
+            method: 'PUT',
+            headers: userFetchHandler.head,
+            body: JSON.stringify(user)
+        }),
+
+        createUser: async (user) => await fetch(URL, {
+            method: 'POST',
+            headers: userFetchHandler.head,
+            body: JSON.stringify(user)
+        }),
+
+        deleteUser: async (id) => await fetch(URL + `/${id}`, {
+            method: 'DELETE',
+            headers: userFetchHandler.head
+        })
+    }
+
+    <!-- All users and modal window's Edit и Delete -->
+    let usersTable = (users) => {
+        let output = '';
+        users.forEach(user => {
+            let roleOfUser = '';
+            for (let a of user.authorities) {
+                roleOfUser += a.authority.replace("ROLE_", "") + " ";
+            }
+            output += `
+                  <tr>
+                    <th scope="row">${user.id}</th>
+                    <td>${user.name}</td>
+                    <td>${user.lastName}</td>
+                    <td>${user.email}</td>
+                    <td>${roleOfUser}</td>
+                    <td>
+                    <a /*th:href="@{/api/users/${user.id}}"*/
+                       class="edit btn btn-info text-white editBtn"
+                       data-toggle="modal" value="${user.id}"><span>Edit</span></a>
+                </td>
+                <td>
+                    <a /*th:href="@{/api/users/${user.id}}"*/
+                       class="btn btn-danger text-white deleteBtn"
+                       data-toggle="modal" value="${user.id}"><span>Delete</span></a>
+                </td>
+                  </tr>
+    `;
+        });
+        userssTable.innerHTML = output;
+    }
+
+    <!-- Update -->
+    function refreshTableUsers() {
+        fetch(URL)
+            .then(response => response.json())
+            .then((data) => {
+                usersTable(data);
+                allModalButtonRegistration();
+                modalButtonListeners();
+            });
+    }
+
+    refreshTableUsers();
+
+    // Edit function
+    let allModalButtonRegistration = () => {
+        $(document).ready(function (event) {
+            $('.table .editBtn').on('click', function (event) {
+                event.preventDefault();
+                const userId = $(this).attr('value');
+                let href = URL + "/" + userId;
+                console.log('href=' + href)
+
+                /*request JQuery from DB*/
+                $.get(href, function (user, status) {
+                    $('.myEditForm #id').val(user.id);
+                    $('.myEditForm #name').val(user.name);
+                    $('.myEditForm #lastName').val(user.lastName);
+                    $('.myEditForm #email').val(user.email);
+                    $('.myEditForm #password').val(user.password);
+                    $('.myEditForm #authorities').val(user.authorities);
+                });
+                $('.myEditForm #editEmployeeModal').modal();
+            });
+
+            // Delete function
+            $('.table .deleteBtn').on('click', function (event) {
+                event.preventDefault();
+                const userId = $(this).attr('value');
+                let href = URL + "/" + userId;
+                console.log('href=' + href);
+
+                /*request JQuery from DB*/
+                $.get(href, function (user, status) {
+                    $('.myDeleteForm #id').val(user.id);
+                    $('.myDeleteForm #name').val(user.name);
+                    $('.myDeleteForm #lastName').val(user.lastName);
+                    $('.myDeleteForm #email').val(user.email);
+                    $('.myDeleteForm #password').val(user.password);
+                    $('.myDeleteForm #authorities').val(user.authorities);
+                    let dB = $('.myDeleteForm #modalDelButton');
+                    dB[0].setAttribute('data-userid', user.id);
+                });
+                $('.myDeleteForm #deleteEmployeeModal').modal();
+            });
+        });
+    };
+
+    let modalButtonListeners = () => {
+        //Delete function from modal
+        $("#deleteEmployeeModal").find('#modalDelButton').on('click', async (event) => {
+            let delModal = $('#deleteEmployeeModal');
+            let id = delModal.find('#id').val().trim();
+            await userFetchHandler.deleteUser(id);
+            delModal.modal('hide');
+            fetch(URL)
+                .then(response => response.json())
+                .then((data) => {
+                    fillTable(data);
+                    allModalButtonRegistration();
+                });
+        })
+
+        //Edit function from modal
+        $("#editEmployeeModal").find('#modalEditButton').on('click', async (event) => {
+
+            let editModal = $('#editEmployeeModal');
+            let id = editModal.find('#id').val();
+            let name = editModal.find('#name').val();
+            let lastName = editModal.find('#lastName').val();
+            let email = editModal.find('#email').val();
+            let password = editModal.find('#password').val();
+            let rolS = editModal.find('#authorities').val();
+            let roles = [];
+            rolS.forEach(roleId => {
+                roles.push({
+                    id: +roleId, authority: roleId == 2 ? "ROLE_USER" : "ROLE_ADMIN"
+                });
+            })
+
+            let user = {
+                id: id,
+                name: name,
+                lastName: lastName,
+                email: email,
+                password: password,
+                authorities: roles
+            }
+            await userFetchHandler.updateUser(user);
+
+            editModal.modal('hide');
+            fetch(URL)
+                .then(response => response.json())
+                .then((data) => {
+                    usersTable(data);
+                    allModalButtonRegistration();
+                });
+        })
+    };
+
+    //Create user
+    $("#newUser").find('#addNewUserButton').on('click', async (event) => {
+
+        let editModal = $('#newUser');
+
+        let firstName = editModal.find('#name').val();
+        let lastName = editModal.find('#lastName').val();
+        let email = editModal.find('#email').val();
+        let password = editModal.find('#password').val();
+        let authorities = editModal.find('#authorities').val();
+        let roles = [];
+
+        authorities.forEach(roleId => {
+            roles.push({
+                id: +roleId, authority: roleId == 1 ? "ROLE_ADMIN" : "ROLE_USER"
+            });
+        })
+
+        let user = {
+            name: firstName,
+            lastName: lastName,
+            email: email,
+            password: password,
+            authorities: roles
+        }
+        await userFetchHandler.createUser(user);
+
+        fetch(URL)
+            .then(response => response.json())
+            .then((data) => {
+                usersTable(data);
+                allModalButtonRegistration();
+            });
+    });
+</script>
 </html>
